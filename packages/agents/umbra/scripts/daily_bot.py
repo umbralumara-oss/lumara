@@ -384,13 +384,13 @@ def main():
     print()
 
     # 6. Публікація в Telegram (якщо налаштовано)
-    bot_token = os.environ.get('TELEGRAM_BOT_TOKEN', '').strip()
+    bot_token = os.environ.get('UMBRA_TELEGRAM_BOT_TOKEN', '').strip() or os.environ.get('TELEGRAM_BOT_TOKEN', '').strip()
     channel_id = os.environ.get('UMBRA_TELEGRAM_CHANNEL_ID', '').strip()
     if bot_token and channel_id:
         print('📬 Публікація в Telegram...')
         publish_to_telegram(image_url, post_text, bot_token, channel_id, 'UMBRA')
     else:
-        print('⏭️  Telegram — не налаштовано (UMBRA_TELEGRAM_CHANNEL_ID)')
+        print('⏭️  Telegram — не налаштовано (UMBRA_TELEGRAM_CHANNEL_ID')
     print()
 
     # 7. Артефакти
