@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 meta_publisher.py — Спільний модуль публікації в Meta платформи
-LUMARA Academy · Використовується всіма агентами (LUNA, ARCAS, NUMI, UMBRA)
+???????? ?????? · Використовується всіма агентами (LUNA, ARCAS, NUMI, UMBRA)
 
 Підтримує:
   - Facebook Pages (текст + фото через /feed з link)
@@ -259,7 +259,7 @@ def publish_to_all_accounts(
     image_url: Optional[str] = None,
     also_post_to_lumara: bool = True,
 ) -> dict:
-    """Публікує в акаунт агента + опційно в LUMARA Academy."""
+    """Публікує в акаунт агента + опційно в ???????? ??????."""
     all_results = {}
 
     agent_account = load_account(agent_name)
