@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Щоденний бот UMBRA — Езо-психологія і тіньова робота
-LUMARA Academy · Запускається о 17:00 UTC (20:00 Київ влітку)
+???????? ?????? · Запускається о 17:00 UTC (20:00 Київ влітку)
 
 Обов'язкові змінні середовища:
   ANTHROPIC_API_KEY          — ключ Anthropic API
@@ -9,9 +9,9 @@ LUMARA Academy · Запускається о 17:00 UTC (20:00 Київ вліт
   UMBRA_PAGE_ACCESS_TOKEN    — постійний Page Access Token UMBRA
   UMBRA_PAGE_ID              — Facebook Page ID UMBRA
   UMBRA_IG_USER_ID           — Instagram Business / Threads Account ID UMBRA
-  LUMARA_PAGE_ACCESS_TOKEN   — постійний Page Access Token LUMARA Academy
-  LUMARA_PAGE_ID             — Facebook Page ID LUMARA Academy
-  LUMARA_IG_USER_ID          — Instagram Business / Threads Account ID LUMARA Academy
+  LUMARA_PAGE_ACCESS_TOKEN   — постійний Page Access Token ???????? ??????
+  LUMARA_PAGE_ID             — Facebook Page ID ???????? ??????
+  LUMARA_IG_USER_ID          — Instagram Business / Threads Account ID ???????? ??????
 """
 
 import os
@@ -75,7 +75,7 @@ SHADOW_THEMES_BY_PHASE = {
 
 # ── Системні промпти ───────────────────────────────────────────────────────────
 
-UMBRA_SYSTEM_PROMPT = """Ти — UMBRA, провідник з езо-психології і тіньової роботи LUMARA Academy.
+UMBRA_SYSTEM_PROMPT = """Ти — UMBRA, провідник з езо-психології і тіньової роботи ???????? ??????.
 
 Твій характер:
 - Глибокий, але не важкий
