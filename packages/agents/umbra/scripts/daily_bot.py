@@ -291,12 +291,15 @@ def send_photo_to_telegram(image_url: str, bot_token: str, channel_id: str) -> d
     """Відправляє фото в Telegram, попередньо завантажуючи його локально."""
     img = httpx.get(image_url, timeout=60)
     img.raise_for_status()
+    print(f'  📥 Зображення завантажено: {len(img.content)} байтів')
     r = httpx.post(
         f'https://api.telegram.org/bot{bot_token}/sendPhoto',
         data={'chat_id': channel_id},
         files={'photo': ('image.png', img.content, 'image/png')},
         timeout=60,
     )
+    if r.status_code != 200:
+        print(f'  ⚠️ Telegram sendPhoto status {r.status_code}: {r.text}')
     r.raise_for_status()
     return r.json()
 
