@@ -393,7 +393,7 @@ def main():
         facebook_text=post_text,
         instagram_caption=instagram_caption,
         image_url=image_url,
-        also_post_to_lumara=True,
+        also_post_to_lumara=False,
     )
     print()
 
