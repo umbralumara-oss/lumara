@@ -20,7 +20,11 @@ jobs:
           cache: 'pip'
           cache-dependency-path: packages/agents/umbra/scripts/requirements.txt
       - run: pip install -r packages/agents/umbra/scripts/requirements.txt
-      - run: python packages/agents/umbra/scripts/daily_bot.py
+      - run: |
+          echo "=== ENV DIAGNOSTICS ==="
+          env | grep -E '^(ANTHROPIC|OPENAI|UMBRA|LUMARA|IG_|TELEGRAM)_' || true
+          echo "======================="
+          python packages/agents/umbra/scripts/daily_bot.py
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
