@@ -151,15 +151,34 @@ def detect_language(text: str) -> str:
     return 'en'
 
 
+def get_post_context(monitor: 'InstagramMonitor', media_id: str) -> dict:
+    """Підтягнути caption для конкретного media_id (fallback якщо не в кеші)."""
+    try:
+        return monitor._get(f'/{media_id}', {'fields': 'caption,media_type,permalink'})
+    except Exception as e:
+        log(f'  ⚠️ Помилка get_post_context {media_id}: {e}')
+        return {}
+
+
 def generate_first_response(agent_type: str, comment_text: str, language: str,
-                             commenter_name: str, cta: str) -> str:
-    """Перша відповідь на коментар (CTA передається ззовні)."""
+                             commenter_name: str, cta: str,
+                             post_caption: str = '') -> str:
+    """Перша відповідь на коментар з контекстом посту."""
     client = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
     system = AGENT_SYSTEM_PROMPT[agent_type]
+
+    post_ctx = ''
+    if post_caption:
+        post_ctx = f'Контекст: ти щойно опублікував(ла) пост в Instagram:\n"""{post_caption[:300]}"""\n\n'
+
     prompt = (
+        f'{post_ctx}'
         f'{commenter_name} залишив коментар: """{comment_text}"""\n\n'
-        f"Напиши коротку (1-3 речення) персональну відповідь мовою '{language}'. "
-        f"Без хештегів. Без CTA."
+        f"Правила відповіді (мова: '{language}'):\n"
+        f'- 1-2 речення, в характері мага\n'
+        f'- якщо питання — дай натяк і натякни написати особисто\n'
+        f'- якщо реакція — подякуй і залиш інтригу\n'
+        f'- без хештегів, без прямих посилань, без CTA'
     )
     try:
         msg = client.messages.create(
@@ -180,10 +199,16 @@ def generate_thread_response(
     new_reply_text: str,
     language: str,
     commenter_name: str,
+    post_caption: str = '',
 ) -> str:
     """Відповідь у гілці з повним контекстом розмови."""
     client = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
-    system = AGENT_SYSTEM_PROMPT[agent_type]
+
+    post_ctx = ''
+    if post_caption:
+        post_ctx = f'Контекст посту під яким відбувається розмова:\n"""{post_caption[:300]}"""\n\n'
+
+    system = AGENT_SYSTEM_PROMPT[agent_type] + (f'\n\n{post_ctx}' if post_ctx else '')
     messages = []
     for m in thread_messages:
         if m['role'] == 'user':
@@ -194,7 +219,7 @@ def generate_thread_response(
         'role': 'user',
         'content': (
             f'{commenter_name}: {new_reply_text}\n\n'
-            f"Відповідай мовою '{language}'. 1-3 речення. Без хештегів. Без CTA."
+            f"Відповідай мовою '{language}'. 1-2 речення. Без хештегів. Без CTA."
         ),
     })
     try:
@@ -494,6 +519,7 @@ def run_instagram_monitoring(
             if agent_today_count >= max_per_day:
                 break
             media_id = post['id']
+            post_caption = (post.get('caption') or '')[:300]
             try:
                 comments = monitor.get_comments(media_id, limit=50)
             except Exception as e:
@@ -518,7 +544,8 @@ def run_instagram_monitoring(
                     log(f'  💬 IG новий від @{username}: {text[:60]}')
                     lang = detect_language(text)
                     cta = IG_CTA_BY_LANG.get(lang, IG_DEFAULT_CTA)
-                    reply_body = generate_first_response(agent, text, lang, f'@{username}', cta)
+                    reply_body = generate_first_response(
+                        agent, text, lang, f'@{username}', cta, post_caption=post_caption)
                     if not reply_body:
                         processed_ids.add(comment_id)
                         continue
@@ -536,6 +563,7 @@ def run_instagram_monitoring(
                         thread_histories[comment_id] = {
                             'exchange_count': 1,
                             'lang': lang,
+                            'post_caption': post_caption,
                             'messages': [
                                 {'role': 'user', 'text': text, 'username': username, 'comment_id': comment_id},
                                 {'role': 'agent', 'text': full_reply, 'comment_id': new_id},
@@ -580,6 +608,7 @@ def run_instagram_monitoring(
                         processed_ids.add(reply_id)
                         lang = thread.get('lang', detect_language(reply_text))
                         exchange_count = thread.get('exchange_count', 1)
+                        thread_caption = thread.get('post_caption', '')
 
                         if exchange_count >= max_exchanges:
                             redirect_text = REDIRECT_MESSAGES.get(lang, REDIRECT_MESSAGES['en'])
@@ -600,7 +629,8 @@ def run_instagram_monitoring(
                                 log(f'    ❌ Помилка IG редіректу: {e}')
                         else:
                             response_body = generate_thread_response(
-                                agent, thread['messages'], reply_text, lang, f'@{reply_username}')
+                                agent, thread['messages'], reply_text, lang, f'@{reply_username}',
+                                post_caption=thread_caption)
                             if not response_body:
                                 continue
                             full_reply = f'@{reply_username}, {response_body}'
@@ -696,6 +726,7 @@ def run_facebook_monitoring(
             if agent_today_count >= max_per_day:
                 break
             post_id = post['id']
+            post_caption = (post.get('message') or '')[:300]
             comments = fb.get_post_comments(post_id, page_token, limit=50)
 
             for comment in comments:
@@ -717,7 +748,8 @@ def run_facebook_monitoring(
                     log(f'  💬 FB новий від {username}: {text[:60]}')
                     lang = detect_language(text)
                     cta = FB_CTA_BY_LANG.get(lang, FB_DEFAULT_CTA)
-                    reply_body = generate_first_response(agent, text, lang, username, cta)
+                    reply_body = generate_first_response(
+                        agent, text, lang, username, cta, post_caption=post_caption)
                     if not reply_body:
                         processed_ids.add(comment_id)
                         continue
@@ -737,6 +769,7 @@ def run_facebook_monitoring(
                         thread_histories[comment_id] = {
                             'exchange_count': 1,
                             'lang': lang,
+                            'post_caption': post_caption,
                             'messages': [
                                 {'role': 'user', 'text': text, 'username': username, 'comment_id': comment_id},
                                 {'role': 'agent', 'text': full_reply, 'comment_id': new_id},
@@ -782,6 +815,7 @@ def run_facebook_monitoring(
                         processed_ids.add(reply_id)
                         lang = thread.get('lang', detect_language(reply_text))
                         exchange_count = thread.get('exchange_count', 1)
+                        thread_caption = thread.get('post_caption', '')
 
                         if exchange_count >= max_exchanges:
                             redirect_text = REDIRECT_MESSAGES.get(lang, REDIRECT_MESSAGES['en'])
@@ -801,7 +835,8 @@ def run_facebook_monitoring(
                                 log(f'    ❌ Помилка FB редіректу: {e}')
                         else:
                             response_body = generate_thread_response(
-                                agent, thread['messages'], reply_text, lang, reply_username)
+                                agent, thread['messages'], reply_text, lang, reply_username,
+                                post_caption=thread_caption)
                             if not response_body:
                                 continue
                             cta = FB_CTA_BY_LANG.get(lang, FB_DEFAULT_CTA)
