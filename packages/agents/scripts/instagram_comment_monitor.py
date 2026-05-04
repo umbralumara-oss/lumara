@@ -411,11 +411,16 @@ def has_sent_dm_to_user(supabase_url: str, supabase_key: str, user_handle: str) 
     try:
         r = httpx.get(
             f'{supabase_url}/rest/v1/outreach_responses',
-            headers={'apikey': supabase_key, 'Authorization': f'Bearer {supabase_key}'},
+            headers={
+                'apikey': supabase_key,
+                'Authorization': f'Bearer {supabase_key}',
+                'Accept': 'application/json',
+            },
             params={
                 'platform': 'eq.INSTAGRAM_DM',
                 'user_handle': f'eq.{user_handle}',
-                'select': '*',
+                'select': 'id',
+                'limit': 1,
             },
             timeout=30,
         )
@@ -431,11 +436,16 @@ def has_sent_fb_dm_to_user(supabase_url: str, supabase_key: str, user_handle: st
     try:
         r = httpx.get(
             f'{supabase_url}/rest/v1/outreach_responses',
-            headers={'apikey': supabase_key, 'Authorization': f'Bearer {supabase_key}'},
+            headers={
+                'apikey': supabase_key,
+                'Authorization': f'Bearer {supabase_key}',
+                'Accept': 'application/json',
+            },
             params={
                 'platform': 'eq.FACEBOOK_DM',
                 'user_handle': f'eq.{user_handle}',
-                'select': '*',
+                'select': 'id',
+                'limit': 1,
             },
             timeout=30,
         )
