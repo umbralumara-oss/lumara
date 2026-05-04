@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from __future__ import annotations
 """
 Моніторинг коментарів Instagram + Facebook — автовідповіді від магів
 ???????? ?????? · Запускається кожну годину (cron)
@@ -411,16 +410,11 @@ def has_sent_dm_to_user(supabase_url: str, supabase_key: str, user_handle: str) 
     try:
         r = httpx.get(
             f'{supabase_url}/rest/v1/outreach_responses',
-            headers={
-                'apikey': supabase_key,
-                'Authorization': f'Bearer {supabase_key}',
-                'Accept': 'application/json',
-            },
+            headers={'apikey': supabase_key, 'Authorization': f'Bearer {supabase_key}'},
             params={
                 'platform': 'eq.INSTAGRAM_DM',
                 'user_handle': f'eq.{user_handle}',
-                'select': 'id',
-                'limit': 1,
+                'select': '*',
             },
             timeout=30,
         )
@@ -436,16 +430,11 @@ def has_sent_fb_dm_to_user(supabase_url: str, supabase_key: str, user_handle: st
     try:
         r = httpx.get(
             f'{supabase_url}/rest/v1/outreach_responses',
-            headers={
-                'apikey': supabase_key,
-                'Authorization': f'Bearer {supabase_key}',
-                'Accept': 'application/json',
-            },
+            headers={'apikey': supabase_key, 'Authorization': f'Bearer {supabase_key}'},
             params={
                 'platform': 'eq.FACEBOOK_DM',
                 'user_handle': f'eq.{user_handle}',
-                'select': 'id',
-                'limit': 1,
+                'select': '*',
             },
             timeout=30,
         )
@@ -511,7 +500,7 @@ def send_facebook_private_reply(comment_id: str, page_token: str, text: str) -> 
 
 
 def process_pending_dms(
-    monitor: 'InstagramMonitor',
+    monitor: InstagramMonitor,
     pending_dms: list,
     supabase_url: str,
     supabase_key: str,
@@ -574,7 +563,7 @@ def process_pending_dms(
 
 
 def process_pending_fb_dms(
-    fb: 'FacebookMonitor',
+    fb: FacebookMonitor,
     pending_fbdms: list,
     supabase_url: str,
     supabase_key: str,
@@ -811,7 +800,7 @@ class FacebookMonitor:
 # ── Instagram monitoring loop ──────────────────────────────────────────────────
 
 def run_instagram_monitoring(
-    monitor: 'InstagramMonitor',
+    monitor: InstagramMonitor,
     accounts: list,
     supabase_url: str,
     supabase_key: str,
@@ -1062,7 +1051,7 @@ def run_instagram_monitoring(
 # ── Facebook monitoring loop ───────────────────────────────────────────────────
 
 def run_facebook_monitoring(
-    fb: 'FacebookMonitor',
+    fb: FacebookMonitor,
     fb_accounts: list,
     supabase_url: str,
     supabase_key: str,
