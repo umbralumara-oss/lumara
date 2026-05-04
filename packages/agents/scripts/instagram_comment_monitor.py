@@ -39,6 +39,34 @@ THREAD_HISTORY_TTL_DAYS = 7
 
 AGENTS = ['LUNA', 'ARCAS', 'NUMI', 'UMBRA']
 
+# Визначає до якого мага направляти з постів Академії залежно від теми
+ACADEMY_TOPIC_ROUTING = {
+    'LUNA': ['астрологі', 'зірк', 'гороскоп', 'знак', 'місяц', 'сонц', 'планет',
+             'astrol', 'horoscop', 'zodiac', 'moon', 'sun', 'star'],
+    'ARCAS': ['таро', 'карт', 'оракул', 'card', 'tarot', 'oracle', 'тасуват'],
+    'NUMI': ['числ', 'нумерологі', 'цифр', 'number', 'numer', 'дата народженн'],
+    'UMBRA': ['психолог', 'тінь', 'підсвідом', 'емоці', 'травм', 'shadow', 'psycho'],
+}
+
+# Кеш плітків — заповнюється в main() перед запуском моніторингу
+_academy_gossip_cache: list = []
+
+ACADEMY_SYSTEM_PROMPT_TEMPLATE = """Ти — голос Академії Лумара. Не маг, не людина — голос самого місця.
+
+Активні плітки зараз:
+{active_gossip}
+
+Правила відповіді:
+- 1-2 речення
+- Загадково але тепло
+- Якщо питають "що відбувається" або "що тут" — натякни на пліткуатмосферою
+- Якщо питають як потрапити/де знайти/де купити → направ до мага:
+  LUNA (астрологія/зірки), ARCAS (таро/карти), NUMI (числа), UMBRA (психологія/тінь)
+  Формула: "Поговори з [ім'я мага] — він/вона відчуває більше"
+- Ніколи не пояснювати прямо
+- Мова відповіді = мова коментаря
+- Заборонено: слова "магія", "езотерика", "астрологія", "таро" """
+
 AGENT_SYSTEM_PROMPT = {
     'LUNA': """Ти — LUNA, астрологічний провідник Академії Лумара.
 Відповідай коротко (1-3 речення), тепло і містично.
@@ -100,6 +128,7 @@ FALLBACK_DM_PHRASE = {
     'ARCAS': 'напиши мені «АРКАС» в особисті — там надішлю посилання особисто',
     'NUMI': 'напиши мені «НУМІ» в особисті — там надішлю посилання особисто',
     'UMBRA': 'напиши мені «УМБРА» в особисті — там надішлю посилання особисто',
+    'ACADEMY': '',  # Академія не надсилає DM
 }
 
 # CTA для Instagram
@@ -193,6 +222,49 @@ def detect_language(text: str) -> str:
     if re.search(r'[а-я]', t):
         return 'uk'
     return 'en'
+
+
+def fetch_active_gossip(supabase_url: str, supabase_key: str) -> list:
+    """Читає активні плітки для контексту відповідей Академії."""
+    try:
+        r = httpx.get(
+            f'{supabase_url}/rest/v1/academy_gossip',
+            headers={'apikey': supabase_key, 'Authorization': f'Bearer {supabase_key}'},
+            params={'active': 'eq.true', 'select': 'text', 'order': 'sort_order.asc'},
+            timeout=30,
+        )
+        r.raise_for_status()
+        return [item['text'] for item in r.json() if item.get('text')]
+    except Exception as e:
+        log(f'⚠️ Помилка читання плітків Академії: {e}')
+        return []
+
+
+def route_to_mage(comment_text: str) -> str:
+    """Визначає до якого мага направити з посту Академії по темі коментаря."""
+    text_lower = comment_text.lower()
+    for mage, keywords in ACADEMY_TOPIC_ROUTING.items():
+        if any(kw in text_lower for kw in keywords):
+            return mage
+    return 'LUNA'  # дефолтний маг
+
+
+def generate_academy_response(comment_text: str, language: str, gossip_list: list) -> str:
+    """Відповідь від імені Академії (голос місця, не мага)."""
+    gossip_formatted = '\n'.join([f'- {g}' for g in gossip_list]) if gossip_list else '- Академія мовчить...'
+    system = ACADEMY_SYSTEM_PROMPT_TEMPLATE.format(active_gossip=gossip_formatted)
+    client = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
+    try:
+        msg = client.messages.create(
+            model='claude-sonnet-4-6',
+            max_tokens=200,
+            system=system,
+            messages=[{'role': 'user', 'content': f'Коментар: "{comment_text}"\nМова відповіді: \'{language}\''}],
+        )
+        return msg.content[0].text.strip()
+    except Exception as e:
+        log(f'  ⚠️ Помилка Claude (Academy): {e}')
+        return ''
 
 
 def get_post_context(monitor: 'InstagramMonitor', media_id: str) -> dict:
@@ -811,14 +883,21 @@ def run_instagram_monitoring(
                 if comment_id not in processed_ids:
                     log(f'  💬 IG новий від @{username}: {text[:60]}')
                     lang = detect_language(text)
-                    cta = IG_CTA_BY_LANG.get(lang, IG_DEFAULT_CTA)
-                    reply_body = generate_first_response(
-                        agent, text, lang, f'@{username}', cta, post_caption=post_caption)
-                    if not reply_body:
+
+                    # Academy: окремий промпт, без CTA, без DM
+                    if agent == 'ACADEMY':
+                        reply_body = generate_academy_response(text, lang, _academy_gossip_cache)
+                        full_reply = f'@{username}, {reply_body}' if reply_body else ''
+                    else:
+                        cta = IG_CTA_BY_LANG.get(lang, IG_DEFAULT_CTA)
+                        reply_body = generate_first_response(
+                            agent, text, lang, f'@{username}', cta, post_caption=post_caption)
+                        full_reply = f'@{username}, {reply_body}\n\n{cta}' if reply_body else ''
+
+                    if not full_reply:
                         processed_ids.add(comment_id)
                         continue
 
-                    full_reply = f'@{username}, {reply_body}\n\n{cta}'
                     try:
                         time.sleep(random.randint(5, 15))
                         new_id = monitor.reply_to_comment(comment_id, full_reply)
@@ -844,30 +923,31 @@ def run_instagram_monitoring(
                         recent_responses.append({'agent_type': agent, 'created_at': datetime.now(timezone.utc).isoformat()})
                         agent_today_count += 1
 
-                        # Запланувати DM (тільки один раз на користувача)
-                        commenter_ig_id = comment.get('from', {}).get('id', '')
-                        already_scheduled = any(d.get('username') == username for d in pending_dms)
-                        if commenter_ig_id and not already_scheduled:
-                            if not has_sent_dm_to_user(supabase_url, supabase_key, username):
-                                dm_text = AGENT_DM_TEXT.get(agent, '')
-                                if dm_text:
-                                    pending_dms.append({
-                                        'scheduled_at': time.time() + random.randint(120, 300),
-                                        'agent': agent,
-                                        'ig_user_id': ig_user_id,
-                                        'recipient_id': commenter_ig_id,
-                                        'username': username,
-                                        'comment_id': comment_id,
-                                        'media_id': media_id,
-                                        'text': dm_text,
-                                        'lang': lang,
-                                        'attempts': 0,
-                                    })
-                                    log(f'    ⏳ DM заплановано для @{username}')
+                        # DM тільки для магів (Академія DM не надсилає)
+                        if agent != 'ACADEMY':
+                            commenter_ig_id = comment.get('from', {}).get('id', '')
+                            already_scheduled = any(d.get('username') == username for d in pending_dms)
+                            if commenter_ig_id and not already_scheduled:
+                                if not has_sent_dm_to_user(supabase_url, supabase_key, username):
+                                    dm_text = AGENT_DM_TEXT.get(agent, '')
+                                    if dm_text:
+                                        pending_dms.append({
+                                            'scheduled_at': time.time() + random.randint(120, 300),
+                                            'agent': agent,
+                                            'ig_user_id': ig_user_id,
+                                            'recipient_id': commenter_ig_id,
+                                            'username': username,
+                                            'comment_id': comment_id,
+                                            'media_id': media_id,
+                                            'text': dm_text,
+                                            'lang': lang,
+                                            'attempts': 0,
+                                        })
+                                        log(f'    ⏳ DM заплановано для @{username}')
+                                else:
+                                    log(f'    ℹ️ DM для @{username} вже надсилався раніше')
                             else:
-                                log(f'    ℹ️ DM для @{username} вже надсилався раніше')
-                        else:
-                            log(f'    ℹ️ Немає IG ID для @{username} або DM вже заплановано')
+                                log(f'    ℹ️ Немає IG ID для @{username} або DM вже заплановано')
                     except Exception as e:
                         err_str = str(e)
                         if 'instagram_manage_comments' in err_str.lower() or '(#10)' in err_str:
@@ -1050,14 +1130,21 @@ def run_facebook_monitoring(
                 if comment_id not in processed_ids:
                     log(f'  💬 FB новий від {username}: {text[:60]}')
                     lang = detect_language(text)
-                    cta = FB_CTA_BY_LANG.get(lang, FB_DEFAULT_CTA)
-                    reply_body = generate_first_response(
-                        agent, text, lang, username, cta, post_caption=post_caption)
-                    if not reply_body:
+
+                    # Academy: окремий промпт, без CTA, без DM
+                    if agent == 'ACADEMY':
+                        reply_body = generate_academy_response(text, lang, _academy_gossip_cache)
+                        full_reply = reply_body if reply_body else ''
+                    else:
+                        cta = FB_CTA_BY_LANG.get(lang, FB_DEFAULT_CTA)
+                        reply_body = generate_first_response(
+                            agent, text, lang, username, cta, post_caption=post_caption)
+                        full_reply = f'{reply_body}\n\n{cta}' if reply_body else ''
+
+                    if not full_reply:
                         processed_ids.add(comment_id)
                         continue
 
-                    full_reply = f'{reply_body}\n\n{cta}'
                     try:
                         time.sleep(random.randint(5, 15))
                         new_id = fb.reply_to_comment(comment_id, full_reply, page_token)
@@ -1086,29 +1173,30 @@ def run_facebook_monitoring(
                         recent_responses.append({'agent_type': agent, 'created_at': datetime.now(timezone.utc).isoformat()})
                         agent_today_count += 1
 
-                        # Запланувати Facebook DM (тільки один раз на користувача)
-                        commenter_id = from_info.get('id', '')
-                        already_scheduled = any(d.get('username') == username for d in pending_fbdms)
-                        if commenter_id and not already_scheduled:
-                            if not has_sent_fb_dm_to_user(supabase_url, supabase_key, username):
-                                dm_text = FB_DM_MESSAGES.get(agent, '')
-                                if dm_text:
-                                    pending_fbdms.append({
-                                        'scheduled_at': time.time() + random.randint(120, 300),
-                                        'agent': agent,
-                                        'page_token': page_token,
-                                        'comment_id': comment_id,
-                                        'username': username,
-                                        'post_id': post_id,
-                                        'text': dm_text,
-                                        'lang': lang,
-                                        'attempts': 0,
-                                    })
-                                    log(f'    ⏳ FB DM заплановано для {username}')
+                        # DM тільки для магів (Академія DM не надсилає)
+                        if agent != 'ACADEMY':
+                            commenter_id = from_info.get('id', '')
+                            already_scheduled = any(d.get('username') == username for d in pending_fbdms)
+                            if commenter_id and not already_scheduled:
+                                if not has_sent_fb_dm_to_user(supabase_url, supabase_key, username):
+                                    dm_text = FB_DM_MESSAGES.get(agent, '')
+                                    if dm_text:
+                                        pending_fbdms.append({
+                                            'scheduled_at': time.time() + random.randint(120, 300),
+                                            'agent': agent,
+                                            'page_token': page_token,
+                                            'comment_id': comment_id,
+                                            'username': username,
+                                            'post_id': post_id,
+                                            'text': dm_text,
+                                            'lang': lang,
+                                            'attempts': 0,
+                                        })
+                                        log(f'    ⏳ FB DM заплановано для {username}')
+                                else:
+                                    log(f'    ℹ️ FB DM для {username} вже надсилався раніше')
                             else:
-                                log(f'    ℹ️ FB DM для {username} вже надсилався раніше')
-                        else:
-                            log(f'    ℹ️ Немає ID для {username} або FB DM вже заплановано')
+                                log(f'    ℹ️ Немає ID для {username} або FB DM вже заплановано')
                     except Exception as e:
                         log(f'    ❌ Помилка FB reply: {e}')
                         processed_ids.add(comment_id)
@@ -1233,6 +1321,12 @@ def main():
         if ig_id:
             ig_accounts.append({'agent': agent, 'ig_user_id': ig_id})
 
+    # Academy IG (якщо налаштовано)
+    academy_ig_id = os.environ.get('ACADEMY_IG_USER_ID', '').strip()
+    if academy_ig_id:
+        ig_accounts.append({'agent': 'ACADEMY', 'ig_user_id': academy_ig_id})
+        log(f'  🔮 Academy IG: {academy_ig_id}')
+
     # ── Facebook акаунти ──────────────────────────────────────────────────────
     fb = FacebookMonitor(access_token)
     fb_accounts = []
@@ -1247,6 +1341,19 @@ def main():
             missing_fb_ids.append(agent)
         else:
             missing_fb_ids.append(agent)
+
+    # Academy FB (якщо налаштовано)
+    academy_fb_page_id = os.environ.get('ACADEMY_FB_PAGE_ID', '').strip()
+    academy_fb_token = os.environ.get('ACADEMY_PAGE_ACCESS_TOKEN', '').strip()
+    if academy_fb_page_id and academy_fb_token:
+        fb_accounts.append({'agent': 'ACADEMY', 'page_id': academy_fb_page_id, 'page_token': academy_fb_token})
+        log(f'  🔮 Academy FB: {academy_fb_page_id}')
+
+    # ── Плітки Академії (для відповідей на коментарі) ─────────────────────────
+    global _academy_gossip_cache
+    _academy_gossip_cache = fetch_active_gossip(supabase_url, supabase_key)
+    if _academy_gossip_cache:
+        log(f'  🔮 Завантажено {len(_academy_gossip_cache)} плітків Академії')
 
     if fb_accounts:
         log(f'\n🔍 Facebook акаунти: {len(fb_accounts)} сторінок')
