@@ -43,6 +43,22 @@ from typing import Optional
 GRAPH_API = 'https://graph.facebook.com/v19.0'
 THREADS_API = 'https://graph.threads.net/v1.0'  # Threads використовує окремий хост
 
+# Тексти першого коментаря під Instagram постом для кожного мага
+IG_FIRST_COMMENTS = {
+    'luna': "✨ Хочеш дізнатись більше особисто?\n💬 Чат: lumara.fyi/chat/LUNA\n📲 Telegram: @luna_lumara\n🔮 Академія Лумара: @lumara",
+    'arcas': "🃏 Карти можуть розказати більше особисто.\n💬 Чат: lumara.fyi/chat/ARCAS\n📲 Telegram: @arcas_lumara\n🔮 Академія Лумара: @lumara",
+    'numi': "🔢 Твої числа чекають розрахунку.\n💬 Чат: lumara.fyi/chat/NUMI\n📲 Telegram: @numi_lumara\n🔮 Академія Лумара: @lumara",
+    'umbra': "🌑 Тінь знає більше ніж ти думаєш.\n💬 Чат: lumara.fyi/chat/UMBRA\n📲 Telegram: @umbra_lumara\n🔮 Академія Лумара: @lumara",
+}
+
+# Тексти першого коментаря під Facebook постом для кожного мага
+FB_FIRST_COMMENTS = {
+    'luna': "✨ Хочеш дізнатись більше особисто?\n💬 Чат: lumara.fyi/chat/LUNA\n📲 Telegram: @luna_lumara\n🔮 Академія Лумара: @lumara",
+    'arcas': "🃏 Карти можуть розказати більше особисто.\n💬 Чат: lumara.fyi/chat/ARCAS\n📲 Telegram: @arcas_lumara\n🔮 Академія Лумара: @lumara",
+    'numi': "🔢 Твої числа чекають розрахунку.\n💬 Чат: lumara.fyi/chat/NUMI\n📲 Telegram: @numi_lumara\n🔮 Академія Лумара: @lumara",
+    'umbra': "🌑 Тінь знає більше ніж ти думаєш.\n💬 Чат: lumara.fyi/chat/UMBRA\n📲 Telegram: @umbra_lumara\n🔮 Академія Лумара: @lumara",
+}
+
 
 @dataclass
 class MetaAccount:
@@ -219,6 +235,7 @@ def publish_to_meta(
             post_id = post_to_facebook_page(account.page_id, page_token, facebook_text, image_url)
             results['facebook'] = post_id
             print(f'  ✅ Facebook: {post_id}')
+            post_first_comment_to_facebook(post_id, page_token, account.name)
         except Exception as e:
             results['facebook'] = f'ERROR: {e}'
             print(f'  ❌ Facebook: {e}')
@@ -233,6 +250,7 @@ def publish_to_meta(
                 post_id = post_to_instagram(account.ig_user_id, account.ig_access_token, image_url, instagram_caption)
                 results['instagram'] = post_id
                 print(f'  ✅ Instagram: {post_id}')
+                post_first_comment_to_instagram(post_id, account.ig_access_token, account.name)
             except Exception as e:
                 results['instagram'] = f'ERROR: {e}'
                 print(f'  ❌ Instagram: {e}')
@@ -250,6 +268,56 @@ def publish_to_meta(
                 print(f'  ❌ Threads: {e}')
 
     return results
+
+
+def post_first_comment_to_instagram(media_id: str, access_token: str, agent_name: str):
+    """
+    Додає перший коментар під Instagram постом з посиланнями.
+    """
+    text = IG_FIRST_COMMENTS.get(agent_name.lower())
+    if not text:
+        return
+    try:
+        r = httpx.post(
+            f'{GRAPH_API}/{media_id}/comments',
+            params={'access_token': access_token, 'message': text[:2200]},
+            timeout=30,
+        )
+        if not r.is_success:
+            print(f'    ⚠️ Instagram коментар помилка: {r.status_code} {r.text[:300]}')
+            return
+        data = r.json()
+        if 'error' in data:
+            print(f'    ⚠️ Instagram коментар API помилка: {data["error"]}')
+            return
+        print(f'  ✅ Перший коментар під Instagram постом')
+    except Exception as e:
+        print(f'    ⚠️ Помилка першого коментаря Instagram: {e}')
+
+
+def post_first_comment_to_facebook(post_id: str, page_token: str, agent_name: str):
+    """
+    Додає перший коментар під Facebook постом з посиланнями.
+    """
+    text = FB_FIRST_COMMENTS.get(agent_name.lower())
+    if not text:
+        return
+    try:
+        r = httpx.post(
+            f'{GRAPH_API}/{post_id}/comments',
+            params={'access_token': page_token, 'message': text[:2200]},
+            timeout=30,
+        )
+        if not r.is_success:
+            print(f'    ⚠️ Facebook коментар помилка: {r.status_code} {r.text[:300]}')
+            return
+        data = r.json()
+        if 'error' in data:
+            print(f'    ⚠️ Facebook коментар API помилка: {data["error"]}')
+            return
+        print(f'  ✅ Перший коментар під Facebook постом')
+    except Exception as e:
+        print(f'    ⚠️ Помилка першого коментаря Facebook: {e}')
 
 
 def publish_to_all_accounts(
