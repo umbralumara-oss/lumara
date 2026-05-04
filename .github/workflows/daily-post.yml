@@ -2,7 +2,7 @@ name: Daily Post — Umbra
 
 on:
   schedule:
-    - cron: '0 16 * * *'
+    - cron: '0 9 * * 4'  # Чт 09:00 UTC = 11:00/12:00 Київ
   workflow_dispatch:
 
 env:
