@@ -501,7 +501,7 @@ def send_facebook_private_reply(comment_id: str, page_token: str, text: str) -> 
 
 
 def process_pending_dms(
-    monitor: InstagramMonitor,
+    monitor: 'InstagramMonitor',
     pending_dms: list,
     supabase_url: str,
     supabase_key: str,
@@ -564,7 +564,7 @@ def process_pending_dms(
 
 
 def process_pending_fb_dms(
-    fb: FacebookMonitor,
+    fb: 'FacebookMonitor',
     pending_fbdms: list,
     supabase_url: str,
     supabase_key: str,
@@ -801,7 +801,7 @@ class FacebookMonitor:
 # ── Instagram monitoring loop ──────────────────────────────────────────────────
 
 def run_instagram_monitoring(
-    monitor: InstagramMonitor,
+    monitor: 'InstagramMonitor',
     accounts: list,
     supabase_url: str,
     supabase_key: str,
@@ -1052,7 +1052,7 @@ def run_instagram_monitoring(
 # ── Facebook monitoring loop ───────────────────────────────────────────────────
 
 def run_facebook_monitoring(
-    fb: FacebookMonitor,
+    fb: 'FacebookMonitor',
     fb_accounts: list,
     supabase_url: str,
     supabase_key: str,
