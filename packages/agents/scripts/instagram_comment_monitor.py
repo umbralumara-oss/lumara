@@ -40,22 +40,66 @@ THREAD_HISTORY_TTL_DAYS = 7
 AGENTS = ['LUNA', 'ARCAS', 'NUMI', 'UMBRA']
 
 AGENT_SYSTEM_PROMPT = {
-    'LUNA': """Ти — LUNA, астрологічний провідник ???????? ??????.
+    'LUNA': """Ти — LUNA, астрологічний провідник Академії Лумара.
 Відповідай коротко (1-3 речення), тепло і містично.
 Дай персональну астрологічну думку — без загальних фраз.
-Мова відповіді = мова коментаря користувача.""",
-    'ARCAS': """Ти — ARCAS, провідник Таро ???????? ??????.
+Мова відповіді = мова коментаря користувача.
+Якщо людина питає як зв'язатись або каже що не знає біо — НЕ відповідай просто 'посилання в біо'. Замість цього запроси в особисті: 'напиши мені «ЛУНА» в особисті — там надішлю посилання особисто'""",
+    'ARCAS': """Ти — ARCAS, провідник Таро Академії Лумара.
 Відповідай коротко (1-3 речення), прямо і глибоко.
 Дай персональну думку через призму карт — без загальних фраз.
-Мова відповіді = мова коментаря користувача.""",
-    'NUMI': """Ти — NUMI, нумеролог ???????? ??????.
+Мова відповіді = мова коментаря користувача.
+Якщо людина питає як зв'язатись або каже що не знає біо — НЕ відповідай просто 'посилання в біо'. Замість цього запроси в особисті: 'напиши мені «АРКАС» в особисті — там надішлю посилання особисто'""",
+    'NUMI': """Ти — NUMI, нумеролог Академії Лумара.
 Відповідай коротко (1-3 речення), точно і спокійно.
 Дай персональну нумерологічну думку — без загальних фраз.
-Мова відповіді = мова коментаря користувача.""",
-    'UMBRA': """Ти — UMBRA, езо-психолог ???????? ??????.
+Мова відповіді = мова коментаря користувача.
+Якщо людина питає як зв'язатись або каже що не знає біо — НЕ відповідай просто 'посилання в біо'. Замість цього запроси в особисті: 'напиши мені «НУМІ» в особисті — там надішлю посилання особисто'""",
+    'UMBRA': """Ти — UMBRA, езо-психолог Академії Лумара.
 Відповідай коротко (1-3 речення), глибоко і без містики.
 Дай персональну психологічну думку — без загальних фраз.
-Мова відповіді = мова коментаря користувача.""",
+Мова відповіді = мова коментаря користувача.
+Якщо людина питає як зв'язатись або каже що не знає біо — НЕ відповідай просто 'посилання в біо'. Замість цього запроси в особисті: 'напиши мені «УМБРА» в особисті — там надішлю посилання особисто'""",
+}
+
+# Тексти DM для кожного мага
+AGENT_DM_TEXT = {
+    'LUNA': "Привіт ✨ Я LUNA — бачила твій коментар.\nЯкщо хочеш поговорити особисто — я тут:\n💬 lumara.fyi/chat/LUNA\n📲 Або в Telegram: @luna_lumara\n🔮 Академія Лумара: @lumara",
+    'ARCAS': "Карти вже показали твій інтерес 🃏\nПоговоримо особисто:\n💬 lumara.fyi/chat/ARCAS\n📲 Telegram: @arcas_lumara\n🔮 Академія Лумара: @lumara",
+    'NUMI': "Числа не випадкові — і твій коментар теж 🔢\nРозрахую особисто:\n💬 lumara.fyi/chat/NUMI\n📲 Telegram: @numi_lumara\n🔮 Академія Лумара: @lumara",
+    'UMBRA': "Ти вже тут — і це не випадково 🌑\nПоговоримо в тіні:\n💬 lumara.fyi/chat/UMBRA\n📲 Telegram: @umbra_lumara\n🔮 Академія Лумара: @lumara",
+}
+
+# Тексти DM для Facebook (через Private Replies API)
+FB_DM_MESSAGES = {
+    'LUNA': """Привіт ✨ Я LUNA — бачила твій коментар.
+Якщо хочеш поговорити особисто — я тут:
+💬 lumara.fyi/chat/LUNA
+📲 Або в Telegram: @luna_lumara
+🔮 Академія Лумара: @lumara""",
+    'ARCAS': """Карти вже показали твій інтерес 🃏
+Поговоримо особисто:
+💬 lumara.fyi/chat/ARCAS
+📲 Telegram: @arcas_lumara
+🔮 Академія Лумара: @lumara""",
+    'NUMI': """Числа не випадкові — і твій коментар теж 🔢
+Розрахую особисто:
+💬 lumara.fyi/chat/NUMI
+📲 Telegram: @numi_lumara
+🔮 Академія Лумара: @lumara""",
+    'UMBRA': """Ти вже тут — і це не випадково 🌑
+Поговоримо в тіні:
+💬 lumara.fyi/chat/UMBRA
+📲 Telegram: @umbra_lumara
+🔮 Академія Лумара: @lumara""",
+}
+
+# Fallback фраза в коментар якщо DM неможливий
+FALLBACK_DM_PHRASE = {
+    'LUNA': 'напиши мені «ЛУНА» в особисті — там надішлю посилання особисто',
+    'ARCAS': 'напиши мені «АРКАС» в особисті — там надішлю посилання особисто',
+    'NUMI': 'напиши мені «НУМІ» в особисті — там надішлю посилання особисто',
+    'UMBRA': 'напиши мені «УМБРА» в особисті — там надішлю посилання особисто',
 }
 
 # CTA для Instagram
@@ -289,6 +333,225 @@ def save_response_to_db(
         log(f'  ⚠️ Помилка збереження в БД: {e}')
 
 
+def has_sent_dm_to_user(supabase_url: str, supabase_key: str, user_handle: str) -> bool:
+    """Перевіряє чи надсилався DM цьому користувачу раніше."""
+    try:
+        r = httpx.get(
+            f'{supabase_url}/rest/v1/outreach_responses',
+            headers={'apikey': supabase_key, 'Authorization': f'Bearer {supabase_key}'},
+            params={
+                'platform': 'eq.INSTAGRAM_DM',
+                'user_handle': f'eq.{user_handle}',
+                'select': '*',
+            },
+            timeout=30,
+        )
+        r.raise_for_status()
+        return len(r.json()) > 0
+    except Exception as e:
+        log(f'⚠️ Помилка перевірки DM для @{user_handle}: {e}')
+        return False
+
+
+def has_sent_fb_dm_to_user(supabase_url: str, supabase_key: str, user_handle: str) -> bool:
+    """Перевіряє чи надсилався Facebook DM цьому користувачу раніше."""
+    try:
+        r = httpx.get(
+            f'{supabase_url}/rest/v1/outreach_responses',
+            headers={'apikey': supabase_key, 'Authorization': f'Bearer {supabase_key}'},
+            params={
+                'platform': 'eq.FACEBOOK_DM',
+                'user_handle': f'eq.{user_handle}',
+                'select': '*',
+            },
+            timeout=30,
+        )
+        r.raise_for_status()
+        return len(r.json()) > 0
+    except Exception as e:
+        log(f'⚠️ Помилка перевірки FB DM для {user_handle}: {e}')
+        return False
+
+
+def send_instagram_dm(access_token: str, ig_user_id: str, recipient_id: str, text: str) -> Optional[str]:
+    """Відправляє DM через Instagram Messaging API."""
+    try:
+        r = httpx.post(
+            f'{GRAPH_API}/{ig_user_id}/messages',
+            params={'access_token': access_token},
+            json={
+                'recipient': {'id': recipient_id},
+                'message': {'text': text[:1000]},
+            },
+            timeout=30,
+        )
+        r.raise_for_status()
+        data = r.json()
+        if 'error' in data:
+            err_msg = str(data['error'])
+            if 'permission' in err_msg.lower() or '(#10)' in err_msg or 'not allowed' in err_msg.lower():
+                raise PermissionError(f'Instagram DM permission denied: {err_msg}')
+            raise RuntimeError(f'Meta API error: {data["error"]}')
+        return data.get('id')
+    except httpx.HTTPStatusError as e:
+        err_text = e.response.text.lower()
+        if 'permission' in err_text or '(#10)' in err_text or 'not allowed' in err_text:
+            raise PermissionError(f'Instagram DM permission denied: {e}')
+        raise
+
+
+def send_facebook_private_reply(comment_id: str, page_token: str, text: str) -> Optional[str]:
+    """Відправляє приватну відповідь на Facebook коментар (Private Replies API).
+    
+    Це дозволяє надіслати ОДНЕ приватне повідомлення в Messenger користувачу,
+    який залишив коментар, без потреби в PSID.
+    """
+    try:
+        r = httpx.post(
+            f'{GRAPH_API}/{comment_id}/private_replies',
+            params={'access_token': page_token, 'message': text[:2000]},
+            timeout=30,
+        )
+        r.raise_for_status()
+        data = r.json()
+        if 'error' in data:
+            err_msg = str(data['error'])
+            if 'permission' in err_msg.lower() or '(#10)' in err_msg or 'not allowed' in err_msg.lower():
+                raise PermissionError(f'Facebook private reply permission denied: {err_msg}')
+            raise RuntimeError(f'Meta API error: {data["error"]}')
+        return data.get('id')
+    except httpx.HTTPStatusError as e:
+        err_text = e.response.text.lower()
+        if 'permission' in err_text or '(#10)' in err_text or 'not allowed' in err_text:
+            raise PermissionError(f'Facebook private reply permission denied: {e}')
+        raise
+
+
+def process_pending_dms(
+    monitor: InstagramMonitor,
+    pending_dms: list,
+    supabase_url: str,
+    supabase_key: str,
+) -> list:
+    """Обробляє заплановані DM: відправляє готові, обробляє помилки."""
+    now = time.time()
+    remaining = []
+    for dm in pending_dms:
+        if dm.get('scheduled_at', 0) > now:
+            remaining.append(dm)
+            continue
+
+        agent = dm['agent']
+        ig_user_id = dm['ig_user_id']
+        recipient_id = dm['recipient_id']
+        username = dm['username']
+        comment_id = dm['comment_id']
+        text = dm['text']
+
+        try:
+            log(f'  📨 Відправка DM @{username} від {agent}...')
+            send_instagram_dm(monitor.token, ig_user_id, recipient_id, text)
+            log(f'    ✅ DM відправлено')
+            save_response_to_db(
+                supabase_url, supabase_key, 'INSTAGRAM_DM',
+                agent, dm.get('lang', 'uk'), dm.get('media_id'), comment_id, text, username,
+            )
+        except PermissionError as e:
+            log(f'    ❌ DM неможливий (permissions): {e}')
+            fallback = FALLBACK_DM_PHRASE.get(agent, '')
+            if fallback:
+                try:
+                    monitor.reply_to_comment(comment_id, fallback)
+                    log(f'    ✅ Fallback коментар відправлено')
+                except Exception as ce:
+                    log(f'    ❌ Помилка fallback коментаря: {ce}')
+            save_response_to_db(
+                supabase_url, supabase_key, 'INSTAGRAM_DM_FAILED',
+                agent, dm.get('lang', 'uk'), dm.get('media_id'), comment_id, f'FAILED: {e}', username,
+            )
+        except Exception as e:
+            log(f'    ❌ Помилка DM: {e}')
+            dm['attempts'] = dm.get('attempts', 0) + 1
+            if dm['attempts'] < 3:
+                remaining.append(dm)
+            else:
+                log(f'    🚫 DM для @{username} скасовано після 3 спроб')
+                fallback = FALLBACK_DM_PHRASE.get(agent, '')
+                if fallback:
+                    try:
+                        monitor.reply_to_comment(comment_id, fallback)
+                        log(f'    ✅ Fallback коментар відправлено')
+                    except Exception as ce:
+                        log(f'    ❌ Помилка fallback коментаря: {ce}')
+                save_response_to_db(
+                    supabase_url, supabase_key, 'INSTAGRAM_DM_FAILED',
+                    agent, dm.get('lang', 'uk'), dm.get('media_id'), comment_id, f'FAILED: {e}', username,
+                )
+    return remaining
+
+
+def process_pending_fb_dms(
+    fb: FacebookMonitor,
+    pending_fbdms: list,
+    supabase_url: str,
+    supabase_key: str,
+) -> list:
+    """Обробляє заплановані Facebook DM: відправляє готові, обробляє помилки."""
+    now = time.time()
+    remaining = []
+    for dm in pending_fbdms:
+        if dm.get('scheduled_at', 0) > now:
+            remaining.append(dm)
+            continue
+
+        agent = dm['agent']
+        comment_id = dm['comment_id']
+        page_token = dm['page_token']
+        username = dm['username']
+        text = dm['text']
+
+        try:
+            log(f'  📨 Відправка FB DM {username} від {agent}...')
+            send_facebook_private_reply(comment_id, page_token, text)
+            log(f'    ✅ FB DM відправлено')
+            save_response_to_db(
+                supabase_url, supabase_key, 'FACEBOOK_DM',
+                agent, dm.get('lang', 'uk'), dm.get('post_id'), comment_id, text, username,
+            )
+        except PermissionError as e:
+            log(f'    ❌ FB DM неможливий (permissions): {e}')
+            fallback = FALLBACK_DM_PHRASE.get(agent, '')
+            if fallback:
+                try:
+                    fb.reply_to_comment(comment_id, fallback, page_token)
+                    log(f'    ✅ FB fallback коментар відправлено')
+                except Exception as ce:
+                    log(f'    ❌ Помилка FB fallback коментаря: {ce}')
+            save_response_to_db(
+                supabase_url, supabase_key, 'FACEBOOK_DM_FAILED',
+                agent, dm.get('lang', 'uk'), dm.get('post_id'), comment_id, f'FAILED: {e}', username,
+            )
+        except Exception as e:
+            log(f'    ❌ Помилка FB DM: {e}')
+            dm['attempts'] = dm.get('attempts', 0) + 1
+            if dm['attempts'] < 3:
+                remaining.append(dm)
+            else:
+                log(f'    🚫 FB DM для {username} скасовано після 3 спроб')
+                fallback = FALLBACK_DM_PHRASE.get(agent, '')
+                if fallback:
+                    try:
+                        fb.reply_to_comment(comment_id, fallback, page_token)
+                        log(f'    ✅ FB fallback коментар відправлено')
+                    except Exception as ce:
+                        log(f'    ❌ Помилка FB fallback коментаря: {ce}')
+                save_response_to_db(
+                    supabase_url, supabase_key, 'FACEBOOK_DM_FAILED',
+                    agent, dm.get('lang', 'uk'), dm.get('post_id'), comment_id, f'FAILED: {e}', username,
+                )
+    return remaining
+
+
 # ── Instagram Monitor ──────────────────────────────────────────────────────────
 
 class InstagramMonitor:
@@ -322,14 +585,14 @@ class InstagramMonitor:
         return data.get('data', [])
 
     def get_comments(self, media_id: str, limit: int = 50) -> list:
-        data = self._get(f'/{media_id}/comments', {'fields': 'id,text,username,timestamp', 'limit': limit})
+        data = self._get(f'/{media_id}/comments', {'fields': 'id,text,username,timestamp,from', 'limit': limit})
         return data.get('data', [])
 
     def get_replies(self, comment_id: str, limit: int = 50) -> list:
         try:
             data = self._get(
                 f'/{comment_id}/replies',
-                {'fields': 'id,text,username,timestamp', 'limit': limit},
+                {'fields': 'id,text,username,timestamp,from', 'limit': limit},
             )
             return data.get('data', [])
         except Exception as e:
@@ -477,12 +740,17 @@ def run_instagram_monitoring(
     our_reply_ids: set = set(state.get('our_reply_ids', []))
     last_response_at: dict = state.get('last_response_at', {})
     thread_histories: dict = state.get('thread_histories', {})
+    pending_dms: list = state.get('pending_dms', [])
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=THREAD_HISTORY_TTL_DAYS)
     thread_histories = {
         k: v for k, v in thread_histories.items()
         if datetime.fromisoformat(v.get('last_activity', '2000-01-01T00:00:00+00:00').replace('Z', '+00:00')) > cutoff
     }
+
+    # Очистка старих pending DMs (старше 24 годин)
+    cutoff_dm = time.time() - 86400
+    pending_dms = [dm for dm in pending_dms if dm.get('scheduled_at', 0) > cutoff_dm]
 
     recent_responses = get_recent_responses_from_db(supabase_url, supabase_key, 'INSTAGRAM_COMMENT', hours=24)
     today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -575,6 +843,31 @@ def run_instagram_monitoring(
                                             agent, lang, media_id, comment_id, full_reply, username)
                         recent_responses.append({'agent_type': agent, 'created_at': datetime.now(timezone.utc).isoformat()})
                         agent_today_count += 1
+
+                        # Запланувати DM (тільки один раз на користувача)
+                        commenter_ig_id = comment.get('from', {}).get('id', '')
+                        already_scheduled = any(d.get('username') == username for d in pending_dms)
+                        if commenter_ig_id and not already_scheduled:
+                            if not has_sent_dm_to_user(supabase_url, supabase_key, username):
+                                dm_text = AGENT_DM_TEXT.get(agent, '')
+                                if dm_text:
+                                    pending_dms.append({
+                                        'scheduled_at': time.time() + random.randint(120, 300),
+                                        'agent': agent,
+                                        'ig_user_id': ig_user_id,
+                                        'recipient_id': commenter_ig_id,
+                                        'username': username,
+                                        'comment_id': comment_id,
+                                        'media_id': media_id,
+                                        'text': dm_text,
+                                        'lang': lang,
+                                        'attempts': 0,
+                                    })
+                                    log(f'    ⏳ DM заплановано для @{username}')
+                            else:
+                                log(f'    ℹ️ DM для @{username} вже надсилався раніше')
+                        else:
+                            log(f'    ℹ️ Немає IG ID для @{username} або DM вже заплановано')
                     except Exception as e:
                         err_str = str(e)
                         if 'instagram_manage_comments' in err_str.lower() or '(#10)' in err_str:
@@ -654,6 +947,10 @@ def run_instagram_monitoring(
                             except Exception as e:
                                 log(f'    ❌ Помилка IG thread reply: {e}')
 
+    # Обробка запланованих DM
+    if pending_dms:
+        pending_dms = process_pending_dms(monitor, pending_dms, supabase_url, supabase_key)
+
     processed_ids = set(list(processed_ids)[-5000:])
     our_reply_ids = set(list(our_reply_ids)[-2000:])
     if len(thread_histories) > 1000:
@@ -666,6 +963,7 @@ def run_instagram_monitoring(
         'our_reply_ids': list(our_reply_ids),
         'last_response_at': last_response_at,
         'thread_histories': thread_histories,
+        'pending_dms': pending_dms,
     })
     return total_processed
 
@@ -688,12 +986,17 @@ def run_facebook_monitoring(
     our_reply_ids: set = set(state.get('our_reply_ids', []))
     last_response_at: dict = state.get('last_response_at', {})
     thread_histories: dict = state.get('thread_histories', {})
+    pending_fbdms: list = state.get('pending_fbdms', [])
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=THREAD_HISTORY_TTL_DAYS)
     thread_histories = {
         k: v for k, v in thread_histories.items()
         if datetime.fromisoformat(v.get('last_activity', '2000-01-01T00:00:00+00:00').replace('Z', '+00:00')) > cutoff
     }
+
+    # Очистка старих pending FB DMs (старше 24 годин)
+    cutoff_dm = time.time() - 86400
+    pending_fbdms = [dm for dm in pending_fbdms if dm.get('scheduled_at', 0) > cutoff_dm]
 
     recent_responses = get_recent_responses_from_db(supabase_url, supabase_key, 'FACEBOOK_COMMENT', hours=24)
     today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -702,7 +1005,7 @@ def run_facebook_monitoring(
     for acc in fb_accounts:
         agent = acc['agent']
         page_id = acc['page_id']
-        page_token = fb.get_page_token(page_id)
+        page_token = acc.get('page_token', fb.get_page_token(page_id))
 
         log(f'\n📘 [{agent}] Facebook сторінка {page_id}...')
 
@@ -782,6 +1085,30 @@ def run_facebook_monitoring(
                                             agent, lang, post_id, comment_id, full_reply, username)
                         recent_responses.append({'agent_type': agent, 'created_at': datetime.now(timezone.utc).isoformat()})
                         agent_today_count += 1
+
+                        # Запланувати Facebook DM (тільки один раз на користувача)
+                        commenter_id = from_info.get('id', '')
+                        already_scheduled = any(d.get('username') == username for d in pending_fbdms)
+                        if commenter_id and not already_scheduled:
+                            if not has_sent_fb_dm_to_user(supabase_url, supabase_key, username):
+                                dm_text = FB_DM_MESSAGES.get(agent, '')
+                                if dm_text:
+                                    pending_fbdms.append({
+                                        'scheduled_at': time.time() + random.randint(120, 300),
+                                        'agent': agent,
+                                        'page_token': page_token,
+                                        'comment_id': comment_id,
+                                        'username': username,
+                                        'post_id': post_id,
+                                        'text': dm_text,
+                                        'lang': lang,
+                                        'attempts': 0,
+                                    })
+                                    log(f'    ⏳ FB DM заплановано для {username}')
+                            else:
+                                log(f'    ℹ️ FB DM для {username} вже надсилався раніше')
+                        else:
+                            log(f'    ℹ️ Немає ID для {username} або FB DM вже заплановано')
                     except Exception as e:
                         log(f'    ❌ Помилка FB reply: {e}')
                         processed_ids.add(comment_id)
@@ -862,6 +1189,10 @@ def run_facebook_monitoring(
                             except Exception as e:
                                 log(f'    ❌ Помилка FB thread reply: {e}')
 
+    # Обробка запланованих Facebook DM
+    if pending_fbdms:
+        pending_fbdms = process_pending_fb_dms(fb, pending_fbdms, supabase_url, supabase_key)
+
     processed_ids = set(list(processed_ids)[-5000:])
     our_reply_ids = set(list(our_reply_ids)[-2000:])
     if len(thread_histories) > 1000:
@@ -874,6 +1205,7 @@ def run_facebook_monitoring(
         'our_reply_ids': list(our_reply_ids),
         'last_response_at': last_response_at,
         'thread_histories': thread_histories,
+        'pending_fbdms': pending_fbdms,
     })
     return total_processed
 
@@ -901,35 +1233,27 @@ def main():
         if ig_id:
             ig_accounts.append({'agent': agent, 'ig_user_id': ig_id})
 
-    # ── Facebook: автовизначення Pages ────────────────────────────────────────
+    # ── Facebook акаунти ──────────────────────────────────────────────────────
     fb = FacebookMonitor(access_token)
-    discovered_pages = fb.discover_pages()
-
-    if discovered_pages:
-        log(f'\n🔍 Знайдено Facebook Pages через /me/accounts:')
-        for pid, info in discovered_pages.items():
-            log(f'   {info["name"]} → ID: {pid}')
-    else:
-        log('\n⚠️ Facebook Pages не знайдено через /me/accounts.')
-        log('   Перевір що токен має права: pages_manage_engagement, pages_read_engagement')
-        log('   Отримай список вручну:')
-        log(f'   curl -s "https://graph.facebook.com/v19.0/me/accounts?fields=id,name&access_token=YOUR_IG_ACCESS_TOKEN" | python3 -m json.tool')
-
     fb_accounts = []
     missing_fb_ids = []
     for agent in AGENTS:
         page_id = os.environ.get(f'{agent}_FB_PAGE_ID', '').strip()
-        if page_id:
-            fb_accounts.append({'agent': agent, 'page_id': page_id})
-            if page_id not in discovered_pages:
-                log(f'  ⚠️ {agent}_FB_PAGE_ID={page_id} не знайдено в /me/accounts — можливо недостатньо прав токена')
+        page_token = os.environ.get(f'{agent}_PAGE_ACCESS_TOKEN', '').strip()
+        if page_id and page_token:
+            fb_accounts.append({'agent': agent, 'page_id': page_id, 'page_token': page_token})
+        elif page_id:
+            log(f'  ⚠️ {agent}_FB_PAGE_ID вказано але {agent}_PAGE_ACCESS_TOKEN відсутній — FB моніторинг для {agent} не працюватиме')
+            missing_fb_ids.append(agent)
         else:
             missing_fb_ids.append(agent)
 
-    if missing_fb_ids and discovered_pages:
-        log(f'\n💡 Для активації FB моніторингу додай у GitHub Secrets і Vercel:')
-        for agent in missing_fb_ids:
-            log(f'   {agent}_FB_PAGE_ID=<знайди ID вище для сторінки {agent}>')
+    if fb_accounts:
+        log(f'\n🔍 Facebook акаунти: {len(fb_accounts)} сторінок')
+        for acc in fb_accounts:
+            log(f'   {acc["agent"]} → {acc["page_id"]}')
+    else:
+        log('\n⚠️ Не налаштовано жодного FB акаунту (потрібні {AGENT}_FB_PAGE_ID + {AGENT}_PAGE_ACCESS_TOKEN)')
 
     # ── Запуск моніторингу ─────────────────────────────────────────────────────
     platform = os.environ.get('MONITOR_PLATFORM', 'all').lower()
