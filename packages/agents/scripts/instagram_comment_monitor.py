@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """
 Моніторинг коментарів Instagram + Facebook — автовідповіді від магів
 ???????? ?????? · Запускається кожну годину (cron)
