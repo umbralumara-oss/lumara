@@ -31,6 +31,11 @@ import httpx
 import anthropic
 from datetime import datetime, timezone, timedelta
 from typing import Optional
+from dotenv import load_dotenv
+
+# Завантажуємо змінні з .env.local для локального запуску
+if os.path.exists('.env.local'):
+    load_dotenv('.env.local')
 
 GRAPH_API = 'https://graph.facebook.com/v19.0'
 MAX_THREAD_EXCHANGES = 5
