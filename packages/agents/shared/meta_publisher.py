@@ -47,27 +47,31 @@ THREADS_API = 'https://graph.threads.net/v1.0'  # Threads використову
 IG_FIRST_COMMENTS = {
     'luna': (
         "✨ Хочеш дізнатись більше особисто?\n"
-        "🌙 Telegram LUNA: lumara.fyi/tg/luna\n"
+        "💬 Чат: lumara.fyi/chat/luna\n"
+        "🌙 Telegram: lumara.fyi/tg/luna\n"
         "🔮 Академія: lumara.fyi"
     ),
     'arcas': (
         "🃏 Карти можуть розказати більше особисто.\n"
-        "🃏 Telegram ARCAS: lumara.fyi/tg/arcas\n"
+        "💬 Чат: lumara.fyi/chat/arcas\n"
+        "🃏 Telegram: lumara.fyi/tg/arcas\n"
         "🔮 Академія: lumara.fyi"
     ),
     'numi': (
         "🔢 Твої числа чекають розрахунку.\n"
-        "🔢 Telegram NUMI: lumara.fyi/tg/numi\n"
+        "💬 Чат: lumara.fyi/chat/numi\n"
+        "🔢 Telegram: lumara.fyi/tg/numi\n"
         "🔮 Академія: lumara.fyi"
     ),
     'umbra': (
         "🌑 Тінь знає більше ніж ти думаєш.\n"
-        "🧠 Telegram UMBRA: lumara.fyi/tg/umbra\n"
+        "💬 Чат: lumara.fyi/chat/umbra\n"
+        "🧠 Telegram: lumara.fyi/tg/umbra\n"
         "🔮 Академія: lumara.fyi"
     ),
     'academy': (
         "🔮 LUMARA Academy\n"
-        "✨ lumara.fyi/tg/academy\n"
+        "✨ Telegram: lumara.fyi/tg/academy\n"
         "🌙 lumara.fyi"
     ),
 }
@@ -76,27 +80,31 @@ IG_FIRST_COMMENTS = {
 FB_FIRST_COMMENTS = {
     'luna': (
         "✨ Хочеш дізнатись більше особисто?\n"
-        "🌙 Telegram LUNA: lumara.fyi/tg/luna\n"
+        "💬 Чат: lumara.fyi/chat/luna\n"
+        "🌙 Telegram: lumara.fyi/tg/luna\n"
         "🔮 Академія: lumara.fyi"
     ),
     'arcas': (
         "🃏 Карти можуть розказати більше особисто.\n"
-        "🃏 Telegram ARCAS: lumara.fyi/tg/arcas\n"
+        "💬 Чат: lumara.fyi/chat/arcas\n"
+        "🃏 Telegram: lumara.fyi/tg/arcas\n"
         "🔮 Академія: lumara.fyi"
     ),
     'numi': (
         "🔢 Твої числа чекають розрахунку.\n"
-        "🔢 Telegram NUMI: lumara.fyi/tg/numi\n"
+        "💬 Чат: lumara.fyi/chat/numi\n"
+        "🔢 Telegram: lumara.fyi/tg/numi\n"
         "🔮 Академія: lumara.fyi"
     ),
     'umbra': (
         "🌑 Тінь знає більше ніж ти думаєш.\n"
-        "🧠 Telegram UMBRA: lumara.fyi/tg/umbra\n"
+        "💬 Чат: lumara.fyi/chat/umbra\n"
+        "🧠 Telegram: lumara.fyi/tg/umbra\n"
         "🔮 Академія: lumara.fyi"
     ),
     'academy': (
         "🔮 LUMARA Academy\n"
-        "✨ lumara.fyi/tg/academy\n"
+        "✨ Telegram: lumara.fyi/tg/academy\n"
         "🌙 lumara.fyi"
     ),
 }
