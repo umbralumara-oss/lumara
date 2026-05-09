@@ -45,20 +45,20 @@ THREADS_API = 'https://graph.threads.net/v1.0'  # Threads використову
 
 # Тексти першого коментаря під Instagram постом для кожного мага
 IG_FIRST_COMMENTS = {
-    'luna': "✨ Хочеш дізнатись більше особисто?\n💬 Чат: lumara.fyi/chat/LUNA\n📲 Telegram: @luna_lumara\n🔮 Академія Лумара: @lumara",
-    'arcas': "🃏 Карти можуть розказати більше особисто.\n💬 Чат: lumara.fyi/chat/ARCAS\n📲 Telegram: @arcas_lumara\n🔮 Академія Лумара: @lumara",
-    'numi': "🔢 Твої числа чекають розрахунку.\n💬 Чат: lumara.fyi/chat/NUMI\n📲 Telegram: @numi_lumara\n🔮 Академія Лумара: @lumara",
-    'umbra': "🌑 Тінь знає більше ніж ти думаєш.\n💬 Чат: lumara.fyi/chat/UMBRA\n📲 Telegram: @umbra_lumara\n🔮 Академія Лумара: @lumara",
-    'academy': "🔮 Академія Лумара · @lumara\nМаги тут: lumara.fyi",
+    'luna': "✨ Хочеш дізнатись більше особисто?\n💬 Чат: lumara.fyi/chat/LUNA\n📲 Telegram: @luna_lumara\n🔮 Академія Лумара: @lumara.fyi",
+    'arcas': "🃏 Карти можуть розказати більше особисто.\n💬 Чат: lumara.fyi/chat/ARCAS\n📲 Telegram: @arcas_lumara\n🔮 Академія Лумара: @lumara.fyi",
+    'numi': "🔢 Твої числа чекають розрахунку.\n💬 Чат: lumara.fyi/chat/NUMI\n📲 Telegram: @numi_lumara\n🔮 Академія Лумара: @lumara.fyi",
+    'umbra': "🌑 Тінь знає більше ніж ти думаєш.\n💬 Чат: lumara.fyi/chat/UMBRA\n📲 Telegram: @umbra_lumara\n🔮 Академія Лумара: @lumara.fyi",
+    'academy': "🔮 Академія Лумара · @lumara.fyi\nМаги тут: lumara.fyi",
 }
 
 # Тексти першого коментаря під Facebook постом для кожного мага
 FB_FIRST_COMMENTS = {
-    'luna': "✨ Хочеш дізнатись більше особисто?\n💬 Чат: lumara.fyi/chat/LUNA\n📲 Telegram: @luna_lumara\n🔮 Академія Лумара: @lumara",
-    'arcas': "🃏 Карти можуть розказати більше особисто.\n💬 Чат: lumara.fyi/chat/ARCAS\n📲 Telegram: @arcas_lumara\n🔮 Академія Лумара: @lumara",
-    'numi': "🔢 Твої числа чекають розрахунку.\n💬 Чат: lumara.fyi/chat/NUMI\n📲 Telegram: @numi_lumara\n🔮 Академія Лумара: @lumara",
-    'umbra': "🌑 Тінь знає більше ніж ти думаєш.\n💬 Чат: lumara.fyi/chat/UMBRA\n📲 Telegram: @umbra_lumara\n🔮 Академія Лумара: @lumara",
-    'academy': "🔮 Академія Лумара · @lumara\nМаги тут: lumara.fyi",
+    'luna': "✨ Хочеш дізнатись більше особисто?\n💬 Чат: lumara.fyi/chat/LUNA\n📲 Telegram: @luna_lumara\n🔮 Академія Лумара: @lumara.fyi",
+    'arcas': "🃏 Карти можуть розказати більше особисто.\n💬 Чат: lumara.fyi/chat/ARCAS\n📲 Telegram: @arcas_lumara\n🔮 Академія Лумара: @lumara.fyi",
+    'numi': "🔢 Твої числа чекають розрахунку.\n💬 Чат: lumara.fyi/chat/NUMI\n📲 Telegram: @numi_lumara\n🔮 Академія Лумара: @lumara.fyi",
+    'umbra': "🌑 Тінь знає більше ніж ти думаєш.\n💬 Чат: lumara.fyi/chat/UMBRA\n📲 Telegram: @umbra_lumara\n🔮 Академія Лумара: @lumara.fyi",
+    'academy': "🔮 Академія Лумара · @lumara.fyi\nМаги тут: lumara.fyi",
 }
 
 
