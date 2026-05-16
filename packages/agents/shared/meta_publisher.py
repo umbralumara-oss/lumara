@@ -44,35 +44,33 @@ GRAPH_API = 'https://graph.facebook.com/v19.0'
 THREADS_API = 'https://graph.threads.net/v1.0'  # Threads використовує окремий хост
 
 # Тексти першого коментаря під Instagram постом для кожного мага
+# ВАЖЛИВО: Instagram не підтримує клікабельні посилання в коментарях.
+# Тому тут немає URL — натомість заклик до дії (біо / DM).
 IG_FIRST_COMMENTS = {
     'luna': (
         "✨ Хочеш дізнатись більше особисто?\n"
-        "💬 Чат: lumara.fyi/chat/luna\n"
-        "🌙 Telegram: lumara.fyi/tg/luna\n"
-        "🔮 Академія: lumara.fyi"
+        "Посилання в біо 👆\n"
+        "Або напиши мені в особисті ✉️"
     ),
     'arcas': (
-        "🃏 Карти можуть розказати більше особисто.\n"
-        "💬 Чат: lumara.fyi/chat/arcas\n"
-        "🃏 Telegram: lumara.fyi/tg/arcas\n"
-        "🔮 Академія: lumara.fyi"
+        "🃏 Карти можуть розказати більше.\n"
+        "Посилання в біо 👆\n"
+        "Або напиши мені в особисті ✉️"
     ),
     'numi': (
-        "🔢 Твої числа чекають розрахунку.\n"
-        "💬 Чат: lumara.fyi/chat/numi\n"
-        "🔢 Telegram: lumara.fyi/tg/numi\n"
-        "🔮 Академія: lumara.fyi"
+        "🔢 Твої числа чекають на тебе.\n"
+        "Посилання в біо 👆\n"
+        "Або напиши мені в особисті ✉️"
     ),
     'umbra': (
         "🌑 Тінь знає більше ніж ти думаєш.\n"
-        "💬 Чат: lumara.fyi/chat/umbra\n"
-        "🧠 Telegram: lumara.fyi/tg/umbra\n"
-        "🔮 Академія: lumara.fyi"
+        "Посилання в біо 👆\n"
+        "Або напиши мені в особисті ✉️"
     ),
     'academy': (
         "🔮 LUMARA Academy\n"
-        "✨ Telegram: lumara.fyi/tg/academy\n"
-        "🌙 lumara.fyi"
+        "Посилання в біо 👆\n"
+        "Або напиши нам в особисті ✉️"
     ),
 }
 
